@@ -35,9 +35,12 @@ object Path {
 
   val slash: Path = AbsolutePath(Vector.empty)
 
-  def apply(parts: GenTraversableOnce[String]): Path =
-    if (parts.isEmpty) EmptyPath
-    else AbsolutePath(parts.toVector)
+  def apply(parts: GenTraversableOnce[String]): Path = {
+    parts match {
+      case p if p.isEmpty => EmptyPath
+      case p              => AbsolutePath(p.toVector)
+    }
+  }
 
   def parse(s: CharSequence): Path = {
     val Parsed.Success(result, _) = UriParser.path.parse(s.toString)
@@ -48,7 +51,8 @@ object Path {
 
 final case class AbemptyPath(parts: Vector[String]) extends Path {
 
-  override def withParts(otherParts: GenTraversableOnce[String]): Path = AbemptyPath(otherParts.toVector)
+  override def withParts(otherParts: GenTraversableOnce[String]): Path =
+    AbemptyPath(otherParts.toVector)
 
   override def toAbsolute: AbsolutePath = AbsolutePath(parts)
 
@@ -56,13 +60,13 @@ final case class AbemptyPath(parts: Vector[String]) extends Path {
 
   override def toRootless: RootlessPath = RootlessPath(parts)
 
-  override def toString = parts.mkString("/", "/", "")
+  override def toString: String = parts.mkString("/", "/", "")
+
 }
 
 final case class AbsolutePath(parts: Vector[String]) extends Path {
 
-  def toAbsolute: AbsolutePath =
-    this
+  def toAbsolute: AbsolutePath = this
 
   def withParts(otherParts: GenTraversableOnce[String]): Path =
     copy(parts = otherParts.toVector)
@@ -71,12 +75,14 @@ final case class AbsolutePath(parts: Vector[String]) extends Path {
 
   override def toRootless: RootlessPath = RootlessPath(parts)
 
-  override def toString = parts.mkString("/", "/", "")
+  override def toString: String = parts.mkString("/", "/", "")
 
 }
 
 final case class NoSchemePath(parts: Vector[String]) extends Path {
-  override def withParts(otherParts: GenTraversableOnce[String]): Path = NoSchemePath(otherParts.toVector)
+
+  override def withParts(otherParts: GenTraversableOnce[String]): Path =
+    NoSchemePath(otherParts.toVector)
 
   override def toRootless: RootlessPath = RootlessPath(parts)
 
@@ -84,42 +90,37 @@ final case class NoSchemePath(parts: Vector[String]) extends Path {
 
   override def isEmpty: Boolean = parts.isEmpty
 
-  override def toString = parts.mkString("", "/", "")
+  override def toString: String = parts.mkString("", "/", "")
+
 }
 
 final case class RootlessPath(parts: Vector[String]) extends Path {
 
-  def toRootless: RootlessPath =
-    this
+  def toRootless: RootlessPath = this
 
-  def toAbsolute: AbsolutePath =
-    AbsolutePath(parts)
+  def toAbsolute: AbsolutePath = AbsolutePath(parts)
 
   def withParts(otherParts: GenTraversableOnce[String]): Path =
     RootlessPath(otherParts.toVector)
 
-  def isEmpty: Boolean =
-    parts.isEmpty
+  def isEmpty: Boolean = parts.isEmpty
 
-  override def toString = parts.mkString("", "/", "")
+  override def toString: String = parts.mkString("", "/", "")
+
 }
 
 case object EmptyPath extends Path {
 
-  def isEmpty: Boolean =
-    true
+  def isEmpty: Boolean = true
 
-  def toAbsolute: AbsolutePath =
-    AbsolutePath(Vector.empty)
+  def toAbsolute: AbsolutePath = AbsolutePath(Vector.empty)
 
   def withParts(parts: GenTraversableOnce[String]): Path =
     Path(parts.toVector)
 
-  def parts: Vector[String] =
-    Vector.empty
+  def parts: Vector[String] = Vector.empty
 
-  def unapply(path: Path): Boolean =
-    path.isEmpty
+  def unapply(path: Path): Boolean = path.isEmpty
 
   override def toRootless: RootlessPath = RootlessPath(parts)
 

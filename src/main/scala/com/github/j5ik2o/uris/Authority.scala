@@ -7,14 +7,6 @@ case class Authority(hostName: String, port: Option[Int], userInfo: Option[UserI
   def withPort(value: Option[Int]): Authority = copy(port = value)
 
   def withUserInfo(value: Option[UserInfo]): Authority = copy(userInfo = value)
-}
 
-/**
-  * foo://example.com:8042/over/there?name=ferret#nose
-  * \_/   \______________/\_________/ \_________/ \__/
-  * |           |            |            |        |
-  * scheme     authority       path        query   fragment
-  * |   _____________________|__
-  * / \ /                        \
-  * urn:example:animal:ferret:nose
-  **/
+  override def toString = s"${userInfo.fold("")(v => s"$v@")}$hostName${port.fold("")(v => s":$v")}"
+}

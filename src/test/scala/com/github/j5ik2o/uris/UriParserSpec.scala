@@ -16,15 +16,30 @@ class UriParserSpec extends FreeSpec with Matchers with PropertyChecks {
 
   val unreservedGen: Gen[Char] =
     Gen.frequency((2, alphaCharGen), (3, digitGen), (5, Gen.oneOf(Seq('-', '.', '_', '~'))))
-  val genDelimsGen               = Gen.oneOf(Seq(':', '/', '?', '#', '[', ']', '@'))
-  val subDelimsGen: Gen[Char]    = Gen.oneOf(Seq('!', '$', '&', '"', '(', ')', '*', '+', ',', ';', '='))
-  val reservedGen                = Gen.frequency((5, genDelimsGen), (5, subDelimsGen))
-  val pctEncodedGen: Gen[String] = Gen.listOfN(2, hexdigit).map(v => "%" + v.mkString)
+  val genDelimsGen                   = Gen.oneOf(Seq(':', '/', '?', '#', '[', ']', '@'))
+  val subDelimsGen: Gen[Char]        = Gen.oneOf(Seq('!', '$', '&', '"', '(', ')', '*', '+', ',', ';', '='))
+  val subDelimsWithoutGen: Gen[Char] = Gen.oneOf(Seq('!', '$', '"', '(', ')', '*', '+', ',', ';'))
+  val reservedGen                    = Gen.frequency((5, genDelimsGen), (5, subDelimsGen))
+  val pctEncodedGen: Gen[String]     = Gen.listOfN(2, hexdigit).map(v => "%" + v.mkString)
   val pcharGen: Gen[String] = Gen.frequency((2, unreservedGen.map(_.toString)),
                                             (3, pctEncodedGen),
                                             (2, subDelimsGen.map(_.toString)),
                                             (3, Gen.oneOf(Seq(':', '@')).map(_.toString)))
-  val queryGen     = Gen.frequency((9, pcharGen), (1, Gen.oneOf(Seq('/', '?')).map(_.toString)))
+  val pcharGen2: Gen[String] = Gen
+    .frequency((2, unreservedGen.map(_.toString)),
+               (3, pctEncodedGen),
+               (2, subDelimsWithoutGen.map(_.toString)),
+               (3, Gen.oneOf(Seq(':', '@')).map(_.toString)))
+
+  val queryGen: Gen[String] = Gen
+    .listOf(pcharGen2.suchThat(_.nonEmpty).flatMap { v1 =>
+      pcharGen2.map { v2 =>
+        v1 + "=" + v2
+      }
+    })
+    .suchThat(_.nonEmpty)
+    .map(_.mkString("&"))
+  //val queryGen     = Gen.frequency((9, pcharGen), (1, Gen.oneOf(Seq('/', '?')).map(_.toString)))
   val fragmentGen  = Gen.frequency((9, pcharGen), (1, Gen.oneOf(Seq('/', '?')).map(_.toString)))
   val segmentGen   = Gen.listOf(pcharGen).map(_.mkString)
   val segmentNzGen = Gen.listOf(pcharGen).map(_.mkString).suchThat(_.nonEmpty)
@@ -126,7 +141,7 @@ class UriParserSpec extends FreeSpec with Matchers with PropertyChecks {
     }
     "query" in forAll(queryGen) { value =>
       val Parsed.Success(result, _) = UriParser.query.parse(value)
-      result shouldBe value
+      result.params.nonEmpty shouldBe true
     }
     "fragment" in forAll(fragmentGen) { value =>
       val Parsed.Success(result, _) = UriParser.fragment.parse(value)
@@ -153,7 +168,7 @@ class UriParserSpec extends FreeSpec with Matchers with PropertyChecks {
       result.toString shouldBe value
     }
     "pathNoscheme" in forAll(pathNoschemeGen) { value =>
-      val Parsed.Success(result, _) = UriParser.pathNoscheme.parse(value)
+      val Parsed.Success(result, _) = UriParser.pathNoScheme.parse(value)
       result.toString shouldBe value
     }
     "pathRootless" in forAll(pathRootlessGen) { value =>
@@ -200,10 +215,16 @@ class UriParserSpec extends FreeSpec with Matchers with PropertyChecks {
       result shouldBe value
     }
     "URI" in {
-      val value = "http://yahoo.co.jp/abc"
+      val value = "http://yahoo.co.jp/abc?key1=abc"
       println(value)
       val Parsed.Success(result, _) = UriParser.URI.parse(value)
-      result shouldBe Uri(Scheme("http"), Authority("yahoo.co.jp", None, None), Path.parse("/abc"), None, None)
+      result shouldBe Uri(Scheme("http"),
+                          Authority("yahoo.co.jp", None, None),
+                          Path.parse("/abc"),
+                          Some(Query(Vector("key1" -> Some("abc")))),
+                          None)
+      result.toString() shouldBe value
+      println(result.toString)
     }
   }
 

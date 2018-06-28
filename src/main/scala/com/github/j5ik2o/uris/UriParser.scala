@@ -1,8 +1,9 @@
 package com.github.j5ik2o.uris
 
-import fastparse.{all, WhitespaceApi}
+import java.net.Inet4Address
+
+import fastparse.WhitespaceApi
 import fastparse.all._
-import sun.font.LayoutPathImpl.EmptyPath
 
 object UriParser extends BaseParser {
   val White = WhitespaceApi.Wrapper {
@@ -31,23 +32,23 @@ object UriParser extends BaseParser {
 
   val relativeRef = P(relativePart ~ ("?" ~ query).? ~ ("#" ~ fragment))
   val relativePart: P[(Authority, Path)] = P(
-    "//" ~ authority ~ (pathAbempty | pathAbsolute | pathNoscheme | pathEmpty)
+    "//" ~ authority ~ (pathAbempty | pathAbsolute | pathNoScheme | pathEmpty)
   )
 
   val scheme: P[Scheme] = P(ALPHA ~ (ALPHA | DIGIT | "+" | "-" | ".").rep).!.map(Scheme)
 
-  val authority: P[Authority] = P((userinfo ~ "@").? ~ host ~ (":" ~ port).?).map {
-    case (userInfoOpt, host, portOpt) =>
-      Authority(host, portOpt, userInfoOpt)
+  val authority: P[Authority] = P((userInfo ~ "@").? ~ host ~ (":" ~ port).?).map {
+    case (userInfoOpt, hostName, portOpt) =>
+      Authority(hostName, portOpt, userInfoOpt)
   }
-  val userinfo: P[UserInfo] = P(
+  val userInfo: P[UserInfo] = P(
     (unreserved | pctEncoded | subDelims).rep ~ (":" ~ (unreserved | pctEncoded | subDelims).rep).?
   ).map {
     case (v1, v2) =>
       UserInfo(v1.mkString, v2.map(_.mkString))
   }
   val host: P[String] = P(ipLiteral | ipv4Address | regName)
-  val port: P[Int]    = P(DIGIT.rep).map(v => v.mkString("").toInt)
+  val port: P[Int]    = P(DIGIT.rep).!.map(_.toInt)
 
   val ipLiteral: P[String] = P("[" ~ (ipv6Address | ipv4Address) ~ "]").!
   val ipvFuture: P[String] = P("v" ~ HEXDIG.rep(1) ~ "." ~ (unreserved | subDelims | ":".!).rep(1)).!
@@ -79,21 +80,19 @@ object UriParser extends BaseParser {
   val ls32: P[String] = P((h16 ~ ":" ~ h16).! | ipv4Address)
 
   val ipv4Address: P[String] =
-    P(decOctet ~ "." ~ decOctet ~ "." ~ decOctet ~ "." ~ decOctet).map(v => v.productIterator.mkString("."))
+    P(decOctet ~ "." ~ decOctet ~ "." ~ decOctet ~ "." ~ decOctet).!
 
   private val decOctet1: P[String] = DIGIT
-  private val decOctet2: P[String] = P(CharIn(0x31.toChar to 0x39.toChar).! ~ DIGIT).map(v => v._1 + v._2)
-  private val decOctet3: P[String] = P("1".! ~ DIGIT ~ DIGIT).map { case (v1, v2, v3) => v1 + v2 + v3 }
-  private val decOctet4: P[String] = P("2".! ~ CharIn(0x30.toChar to 0x34.toChar).! ~ DIGIT).map {
-    case (v1, v2, v3) => v1 + v2 + v3
-  }
-  private val decOctet5: P[String] = P("25".! ~ CharIn(0x30.toChar to 0x35.toChar).!).map { case (v1, v2) => v1 + v2 }
+  private val decOctet2: P[String] = P(CharIn(0x31.toChar to 0x39.toChar).! ~ DIGIT).!
+  private val decOctet3: P[String] = P("1".! ~ DIGIT ~ DIGIT).!
+  private val decOctet4: P[String] = P("2".! ~ CharIn(0x30.toChar to 0x34.toChar).! ~ DIGIT).!
+  private val decOctet5: P[String] = P("25".! ~ CharIn(0x30.toChar to 0x35.toChar).!).!
 
   val decOctet = P(decOctet5 | decOctet4 | decOctet3 | decOctet2 | decOctet1)
 
-  val regName: P[String] = P((unreserved | pctEncoded | subDelims).rep).map(_.mkString)
+  val regName: P[String] = P((unreserved | pctEncoded | subDelims).rep).!
 
-  val path: P[Path] = P(pathRootless | pathNoscheme | pathAbempty | pathAbsolute | pathEmpty)
+  val path: P[Path] = P(pathRootless | pathNoScheme | pathAbempty | pathAbsolute | pathEmpty)
 
   val pathAbempty: P[AbemptyPath] = P(("/" ~ segment).rep).map { v =>
     AbemptyPath(v.toVector)
@@ -107,7 +106,7 @@ object UriParser extends BaseParser {
       .getOrElse(AbsolutePath(Vector.empty))
   }
 
-  val pathNoscheme: P[NoSchemePath] = P(segmentNzNc ~ ("/" ~ segment).rep).map {
+  val pathNoScheme: P[NoSchemePath] = P(segmentNzNc ~ ("/" ~ segment).rep).map {
     case (v1, v2) =>
       NoSchemePath(v1 +: v2.toVector)
   }
@@ -121,16 +120,21 @@ object UriParser extends BaseParser {
   val segmentNz: P[String]   = P(pchar.rep(1)).map(_.mkString)
   val segmentNzNc: P[String] = P((unreserved | pctEncoded | subDelims | "@".!).rep(1)).map(_.mkString)
 
-  val pchar: P[String] = P(unreserved | pctEncoded | subDelims | ":".! | "@".!)
+  val pchar: P[String]  = P(unreserved | pctEncoded | subDelims | ":".! | "@".!)
+  val pchar2: P[String] = P(unreserved | pctEncoded | subDelimsWithout | ":".! | "@".!)
 
-  val query: P[String]    = P((pchar | "/".! | "?".!).rep).map(_.mkString)
-  val fragment: P[String] = P((pchar | "/".! | "?".!).rep).map(_.mkString)
+  val query: P[Query] =
+    P(((pchar2 | "/" | "?").rep.! ~ ("=" ~ (pchar2 | "/" | "?").rep.!).?).rep(sep = "&")).map { v =>
+      Query(v.toVector)
+    }
 
-  val pctEncoded: P[String] = P("%" ~ HEXDIG ~ HEXDIG).map { case (v1, v2) => "%" + v1 + v2 }
+  val fragment: P[String] = P((pchar | "/" | "?").rep).!
 
-  val unreserved: P[String] = P(ALPHA | DIGIT | "-".! | ".".! | "_".! | "~".!)
-  val reserved: P[String]   = P(genDelims | subDelims)
-  val genDelims: P[String]  = P((":" | "/" | "?" | "#" | "[" | "]" | "@").!)
-  val subDelims: P[String]  = P(("!" | "$" | "&" | "\"" | "(" | ")" | "*" | "+" | "," | ";" | "=").!)
+  val pctEncoded: P[String] = P("%" ~ HEXDIG ~ HEXDIG).!
 
+  val unreserved: P[String]       = P(ALPHA | DIGIT | "-".! | ".".! | "_".! | "~".!)
+  val reserved: P[String]         = P(genDelims | subDelims)
+  val genDelims: P[String]        = P((":" | "/" | "?" | "#" | "[" | "]" | "@").!)
+  val subDelims: P[String]        = P(("!" | "$" | "&" | "\"" | "(" | ")" | "*" | "+" | "," | ";" | "=").!)
+  val subDelimsWithout: P[String] = P(("!" | "$" | "\"" | "(" | ")" | "*" | "+" | "," | ";").!)
 }
