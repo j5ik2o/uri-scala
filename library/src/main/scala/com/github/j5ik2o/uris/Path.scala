@@ -33,16 +33,15 @@ object Path {
 
   val slash: Path = AbsolutePath(Vector.empty)
 
-  def apply(parts: IterableOnce[String]): Path = {
+  def fromParts(parts: IterableOnce[String]): Path = {
     parts match {
       case p if p.iterator.isEmpty => EmptyPath
       case p                       => AbsolutePath(p.iterator.toVector)
     }
   }
 
-  def apply(value: String): Path = {
+  def parseWithException(value: String): Path =
     parse(value).fold(throw _, identity)
-  }
 
   def parse(s: CharSequence): Either[ParseException, Path] = {
     import fastparse._
@@ -125,7 +124,7 @@ case object EmptyPath extends Path {
   def toAbsolute: AbsolutePath = AbsolutePath(Vector.empty)
 
   def withParts(parts: IterableOnce[String]): Path =
-    Path(parts.iterator.to(Vector))
+    Path.fromParts(parts.iterator.to(Vector))
 
   def parts: Vector[String] = Vector.empty
 

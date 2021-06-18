@@ -231,10 +231,10 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
       val value                     = "http://yahoo.co.jp/abc?key1=abc"
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.uri(_))
       result shouldBe Uri(
-        Scheme("http"),
-        Authority("yahoo.co.jp", None, None),
-        Path("/abc"),
-        Some(Query(Vector("key1" -> Some("abc")))),
+        Scheme.parseWithException("http"),
+        Authority.parseWithException("yahoo.co.jp", None, None),
+        Path.parseWithException("/abc"),
+        Some(Query.parseWithException(Vector("key1" -> Some("abc")))),
         None
       )
       result.toString() shouldBe value

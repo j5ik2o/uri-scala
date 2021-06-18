@@ -6,6 +6,9 @@ final case class Scheme(value: String)
 
 object Scheme {
 
+  def parseWithException(s: CharSequence): Scheme =
+    parse(s.toString).fold(throw _, identity)
+
   def parse(s: CharSequence): Either[ParseException, Scheme] = {
     import fastparse._
     val parsed = fastparse.parse(s.toString, UriParser.scheme(_))

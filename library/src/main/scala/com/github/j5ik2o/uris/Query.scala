@@ -2,7 +2,7 @@ package com.github.j5ik2o.uris
 
 import java.text.ParseException
 
-case class Query(params: Vector[(String, Option[String])]) {
+case class Query private (params: Vector[(String, Option[String])]) {
 
   lazy val paramMap: Map[String, Vector[String]] = params.foldLeft(Map.empty[String, Vector[String]]) {
     case (m, (k, Some(v))) =>
@@ -96,6 +96,10 @@ case class Query(params: Vector[(String, Option[String])]) {
 }
 
 object Query {
+
+  def parseWithException(params: Vector[(String, Option[String])]): Query = {
+    parse(new Query(params).toString).fold(throw _, identity)
+  }
 
   def parse(s: CharSequence): Either[ParseException, Query] = {
     import fastparse._

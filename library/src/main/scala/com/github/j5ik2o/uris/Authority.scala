@@ -15,6 +15,15 @@ case class Authority(hostName: String, port: Option[Int], userInfo: Option[UserI
 
 object Authority {
 
+  def parseWithException(hostName: String, port: Option[Int], userInfo: Option[UserInfo]): Authority =
+    parse(hostName, port, userInfo).fold(throw _, identity)
+
+  def parse(hostName: String, port: Option[Int], userInfo: Option[UserInfo]): Either[ParseException, Authority] = {
+    parse(new Authority(hostName, port, userInfo).toString)
+  }
+
+  def parseWithException(s: CharSequence): Authority = parse(s).fold(throw _, identity)
+
   def parse(s: CharSequence): Either[ParseException, Authority] = {
     import fastparse._
     val parsed = fastparse.parse(s.toString, UriParser.authority(_))

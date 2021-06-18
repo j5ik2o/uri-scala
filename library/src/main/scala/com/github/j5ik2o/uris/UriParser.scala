@@ -5,18 +5,14 @@ import fastparse._
 
 object UriParser extends BaseParser {
 
-//  def parse[_: P](text: String): Parsed[Uri] = {
-//    fastparse.parse(text, URI(_))
-//  }
-
   def absoluteURI[_: P]: P[Uri] = P(scheme ~ ":" ~ hierPart ~ ("?" ~ query).? ~ End).map {
     case (scheme, (authority, path), query) =>
-      Uri(scheme, authority, path, query, None)
+      new Uri(scheme, authority, path, query, None)
   }
 
   def uri[_: P]: P[Uri] = P(scheme ~ ":" ~ hierPart ~ ("?" ~ query).? ~ ("#" ~ fragment).? ~ End).map {
     case (scheme, (authority, path), query, fragment) =>
-      Uri(scheme, authority, path, query, fragment)
+      new Uri(scheme, authority, path, query, fragment)
   }
 
   // def uRIReference = P(URI | relativeRef)
@@ -36,14 +32,14 @@ object UriParser extends BaseParser {
 
   def authority[_: P]: P[Authority] = P((userInfo ~ "@").? ~ host ~ (":" ~ port).?).map {
     case (userInfoOpt, hostName, portOpt) =>
-      Authority(hostName, portOpt, userInfoOpt)
+      new Authority(hostName, portOpt, userInfoOpt)
   }
 
   def userInfo[_: P]: P[UserInfo] =
     P(
       (unreserved | pctEncoded | subDelims).rep ~ (":" ~ (unreserved | pctEncoded | subDelims).rep).?
     ).map { case (v1, v2) =>
-      UserInfo(v1.mkString, v2.map(_.mkString))
+      new UserInfo(v1.mkString, v2.map(_.mkString))
     }
   def host[_: P]: P[String] = P(ipLiteral | ipv4Address | regName)
   def port[_: P]: P[Int]    = P(DIGIT.rep).!.map(_.toInt)
