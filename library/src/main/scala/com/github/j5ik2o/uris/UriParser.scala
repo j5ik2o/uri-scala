@@ -14,7 +14,7 @@ object UriParser extends BaseParser {
       Uri(scheme, authority, path, query, None)
   }
 
-  def URI[_: P]: P[Uri] = P(scheme ~ ":" ~ hierPart ~ ("?" ~ query).? ~ ("#" ~ fragment).? ~ End).map {
+  def uri[_: P]: P[Uri] = P(scheme ~ ":" ~ hierPart ~ ("?" ~ query).? ~ ("#" ~ fragment).? ~ End).map {
     case (scheme, (authority, path), query, fragment) =>
       Uri(scheme, authority, path, query, fragment)
   }
@@ -32,7 +32,7 @@ object UriParser extends BaseParser {
     "//" ~ authority ~ (pathAbempty | pathAbsolute | pathNoScheme | pathEmpty)
   )
 
-  def scheme[_: P]: P[Scheme] = P(ALPHA ~ (ALPHA | DIGIT | "+" | "-" | ".").rep).!.map(Scheme)
+  def scheme[_: P]: P[Scheme] = P(ALPHA ~ (ALPHA | DIGIT | "+" | "-" | ".").rep).!.map(Scheme.apply)
 
   def authority[_: P]: P[Authority] = P((userInfo ~ "@").? ~ host ~ (":" ~ port).?).map {
     case (userInfoOpt, hostName, portOpt) =>
@@ -80,7 +80,7 @@ object UriParser extends BaseParser {
   //  [ *6( h16 ":" ) h16 ] "::"
   def ipv6Address9[_: P]: P[String] = P(((h16 ~ ":").rep(max = 6) ~ h16).? ~ "::").!
 
-  def ipv6Address[_: P] = P(
+  def ipv6Address[_: P]: P[String] = P(
     ipv6Address1 | ipv6Address2 | ipv6Address3 | ipv6Address4 | ipv6Address4 | ipv6Address5 | ipv6Address6 | ipv6Address7 | ipv6Address8 | ipv6Address9
   )
 

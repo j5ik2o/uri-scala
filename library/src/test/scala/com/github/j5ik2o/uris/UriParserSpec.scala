@@ -220,28 +220,24 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
       result shouldBe value
     }
     "ipv6Address1" in forAll(ipv6AddressGen1) { value =>
-      println(value)
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.ipv6Address(_))
       result shouldBe value
     }
     "ipv6Address2" in forAll(ipv6AddressGen2) { value =>
-      println(value)
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.ipv6Address(_))
       result shouldBe value
     }
     "URI" in {
-      val value = "http://yahoo.co.jp/abc?key1=abc"
-      println(value)
-      val Parsed.Success(result, _) = fastparse.parse(value, UriParser.URI(_))
+      val value                     = "http://yahoo.co.jp/abc?key1=abc"
+      val Parsed.Success(result, _) = fastparse.parse(value, UriParser.uri(_))
       result shouldBe Uri(
         Scheme("http"),
         Authority("yahoo.co.jp", None, None),
-        Path.parse("/abc"),
+        Path.parse("/abc").fold(ex => throw ex, identity),
         Some(Query(Vector("key1" -> Some("abc")))),
         None
       )
       result.toString() shouldBe value
-      println(result.toString)
     }
   }
 

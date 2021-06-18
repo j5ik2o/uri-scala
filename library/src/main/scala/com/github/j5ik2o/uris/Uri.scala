@@ -1,5 +1,7 @@
 package com.github.j5ik2o.uris
 
+import java.text.ParseException
+
 case class Uri(scheme: Scheme, authority: Authority, path: Path, query: Option[Query], fragment: Option[String]) {
 
   def isAbsolute: Boolean = fragment.isEmpty
@@ -25,6 +27,22 @@ case class Uri(scheme: Scheme, authority: Authority, path: Path, query: Option[Q
 
   override def toString(): String = {
     s"${scheme.value}://$authority$path${query.fold("")(v => s"?$v")}${fragment.fold("")(v => s"#$v")}"
+  }
+
+}
+
+object Uri {
+
+  def parse(s: CharSequence): Either[ParseException, Uri] = {
+    import fastparse._
+    val parsed = fastparse.parse(s.toString, UriParser.uri(_))
+    if (parsed.isSuccess) {
+      val Parsed.Success(result, _) = parsed
+      Right(result)
+    } else {
+      val Parsed.Failure(msg, index, _) = parsed
+      Left(new ParseException(msg, index))
+    }
   }
 
 }

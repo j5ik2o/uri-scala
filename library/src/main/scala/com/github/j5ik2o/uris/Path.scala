@@ -1,5 +1,7 @@
 package com.github.j5ik2o.uris
 
+import java.text.ParseException
+
 sealed trait Path {
 
   def parts: Vector[String]
@@ -38,10 +40,16 @@ object Path {
     }
   }
 
-  def parse(s: CharSequence): Path = {
+  def parse(s: CharSequence): Either[ParseException, Path] = {
     import fastparse._
-    val Parsed.Success(result, _) = fastparse.parse(s.toString, UriParser.path(_))
-    result
+    val parsed = fastparse.parse(s.toString, UriParser.path(_))
+    if (parsed.isSuccess) {
+      val Parsed.Success(result, _) = parsed
+      Right(result)
+    } else {
+      val Parsed.Failure(msg, index, _) = parsed
+      Left(new ParseException(msg, index))
+    }
   }
 
 }

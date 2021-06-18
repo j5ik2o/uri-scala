@@ -1,5 +1,7 @@
 package com.github.j5ik2o.uris
 
+import java.text.ParseException
+
 case class Query(params: Vector[(String, Option[String])]) {
 
   lazy val paramMap: Map[String, Vector[String]] = params.foldLeft(Map.empty[String, Vector[String]]) {
@@ -91,4 +93,20 @@ case class Query(params: Vector[(String, Option[String])]) {
           s"$k=${v.mkString(",")}"
       }
       .mkString("&")
+}
+
+object Query {
+
+  def parse(s: CharSequence): Either[ParseException, Query] = {
+    import fastparse._
+    val parsed = fastparse.parse(s.toString, UriParser.query(_))
+    if (parsed.isSuccess) {
+      val Parsed.Success(result, _) = parsed
+      Right(result)
+    } else {
+      val Parsed.Failure(msg, index, _) = parsed
+      Left(new ParseException(msg, index))
+    }
+  }
+
 }
