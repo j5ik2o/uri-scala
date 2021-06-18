@@ -1,4 +1,4 @@
-package com.github.j5ik2o.uris
+package com.github.j5ik2o.uri
 
 import java.text.ParseException
 
