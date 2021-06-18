@@ -47,24 +47,21 @@ case class Query(params: Vector[(String, Option[String])]) {
     Query(params.flatMap(f))
 
   def mapNames(f: String => String): Query =
-    Query(params.map {
-      case (n, v) =>
-        (f(n), v)
+    Query(params.map { case (n, v) =>
+      (f(n), v)
     })
 
   def mapValues(f: String => String): Query =
-    Query(params.map {
-      case (n, v) =>
-        (n, v map f)
+    Query(params.map { case (n, v) =>
+      (n, v map f)
     })
 
   def filter(f: ((String, Option[String])) => Boolean): Query =
     Query(params.filter(f))
 
   def filterNames(f: String => Boolean): Query =
-    Query(params.filter {
-      case (n, _) =>
-        f(n)
+    Query(params.filter { case (n, _) =>
+      f(n)
     })
 
   def filterValues(f: String => Boolean): Query =
@@ -74,9 +71,8 @@ case class Query(params: Vector[(String, Option[String])]) {
     })
 
   def filterOptionValues(f: Option[String] => Boolean): Query =
-    Query(params.filter {
-      case (_, v) =>
-        f(v)
+    Query(params.filter { case (_, v) =>
+      f(v)
     })
   def replaceAll(k: String, v: Option[String]): Query = Query(params.filterNot(_._1 == k) :+ (k -> v))
   def replaceAll(k: String, v: String): Query         = replaceAll(k, Some(v))
@@ -88,12 +84,11 @@ case class Query(params: Vector[(String, Option[String])]) {
 
   override def toString =
     paramMap
-      .map {
-        case (k, v) =>
-          if (v.isEmpty)
-            k
-          else
-            s"$k=${v.mkString(",")}"
+      .map { case (k, v) =>
+        if (v.isEmpty)
+          k
+        else
+          s"$k=${v.mkString(",")}"
       }
       .mkString("&")
 }

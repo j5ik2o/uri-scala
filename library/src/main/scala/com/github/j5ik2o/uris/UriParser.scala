@@ -42,9 +42,8 @@ object UriParser extends BaseParser {
   def userInfo[_: P]: P[UserInfo] =
     P(
       (unreserved | pctEncoded | subDelims).rep ~ (":" ~ (unreserved | pctEncoded | subDelims).rep).?
-    ).map {
-      case (v1, v2) =>
-        UserInfo(v1.mkString, v2.map(_.mkString))
+    ).map { case (v1, v2) =>
+      UserInfo(v1.mkString, v2.map(_.mkString))
     }
   def host[_: P]: P[String] = P(ipLiteral | ipv4Address | regName)
   def port[_: P]: P[Int]    = P(DIGIT.rep).!.map(_.toInt)
@@ -108,21 +107,18 @@ object UriParser extends BaseParser {
   }
 
   def pathAbsolute[_: P]: P[AbsolutePath] = P("/" ~ (segmentNz ~ ("/" ~ segment).rep).?).map { v =>
-    v.map {
-        case (h, t) =>
-          AbsolutePath(h +: t.toVector)
-      }
+    v.map { case (h, t) =>
+      AbsolutePath(h +: t.toVector)
+    }
       .getOrElse(AbsolutePath(Vector.empty))
   }
 
-  def pathNoScheme[_: P]: P[NoSchemePath] = P(segmentNzNc ~ ("/" ~ segment).rep).map {
-    case (v1, v2) =>
-      NoSchemePath(v1 +: v2.toVector)
+  def pathNoScheme[_: P]: P[NoSchemePath] = P(segmentNzNc ~ ("/" ~ segment).rep).map { case (v1, v2) =>
+    NoSchemePath(v1 +: v2.toVector)
   }
 
-  def pathRootless[_: P]: P[RootlessPath] = P(segmentNz ~ ("/" ~ segment).rep).map {
-    case (v1, v2) =>
-      RootlessPath(v1 +: v2.toVector)
+  def pathRootless[_: P]: P[RootlessPath] = P(segmentNz ~ ("/" ~ segment).rep).map { case (v1, v2) =>
+    RootlessPath(v1 +: v2.toVector)
   }
   def pathEmpty[_: P]: P[Path] = P(pchar.?).map(_ => EmptyPath)
 
