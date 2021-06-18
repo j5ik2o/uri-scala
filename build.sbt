@@ -72,7 +72,7 @@ lazy val library = (project in file("library"))
   .settings(
     name := "uris",
     libraryDependencies ++= Seq(
-      "com.lihaoyi"       %% "fastparse"       % "2.2.2",
+      "com.lihaoyi"       %% "fastparse"       % "2.2.4",
       "org.typelevel"     %% "cats-core"       % "2.6.1",
       "org.scalatest"     %% "scalatest"       % "3.2.9"   % "test",
       "org.scalatestplus" %% "scalacheck-1-15" % "3.2.9.0" % "test"
