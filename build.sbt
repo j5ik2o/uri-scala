@@ -39,8 +39,7 @@ lazy val baseSettings = Seq(
       "-deprecation",
       "-encoding",
       "UTF-8",
-      "-language:implicitConversions",
-      "language:postfixOps"
+      "-language:_"
     ) ++ crossScalacOptions(scalaVersion.value)
   ),
   resolvers ++= Seq(
