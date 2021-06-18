@@ -40,6 +40,10 @@ object Path {
     }
   }
 
+  def apply(value: String): Path = {
+    parse(value).fold(throw _, identity)
+  }
+
   def parse(s: CharSequence): Either[ParseException, Path] = {
     import fastparse._
     val parsed = fastparse.parse(s.toString, UriParser.path(_))

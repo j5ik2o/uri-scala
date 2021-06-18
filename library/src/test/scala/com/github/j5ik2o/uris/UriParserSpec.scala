@@ -233,7 +233,7 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
       result shouldBe Uri(
         Scheme("http"),
         Authority("yahoo.co.jp", None, None),
-        Path.parse("/abc").fold(ex => throw ex, identity),
+        Path("/abc"),
         Some(Query(Vector("key1" -> Some("abc")))),
         None
       )
