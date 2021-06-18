@@ -1,7 +1,5 @@
 package com.github.j5ik2o.uris
 
-import scala.collection.{GenTraversable, GenTraversableOnce}
-
 case class Query(params: Vector[(String, Option[String])]) {
 
   lazy val paramMap: Map[String, Vector[String]] = params.foldLeft(Map.empty[String, Vector[String]]) {
@@ -21,15 +19,17 @@ case class Query(params: Vector[(String, Option[String])]) {
 
   def withParams(other: Query): Query           = Query(params ++ other.params)
   def withParams(kvs: (String, String)*): Query = withParams(kvs)
-  def withParams(kvs: GenTraversable[(String, String)]): Query =
+
+  def withParams(kvs: Iterable[(String, String)]): Query =
     withParamsOptionValues(kvs.map { case (k, v) => (k, Some(v)) })
 
-  def withParamsOptionValues(kvs: GenTraversable[(String, Option[String])]): Query = Query(params ++ kvs)
-  def withParamsOptionValues(kvs: (String, Option[String])*): Query                = withParamsOptionValues(kvs)
+  def withParamsOptionValues(kvs: Iterable[(String, Option[String])]): Query = Query(params ++ kvs)
+  def withParamsOptionValues(kvs: (String, Option[String])*): Query          = withParamsOptionValues(kvs)
 
   def getParams(key: String): Vector[Option[String]] = params.collect {
     case (k, v) if k == key => v
   }
+
   def getParam(key: String): Option[String] = params.collectFirst {
     case (k, Some(v)) if k == key => v
   }
@@ -39,38 +39,50 @@ case class Query(params: Vector[(String, Option[String])]) {
       if (f.isDefinedAt(kv)) f(kv) else kv
     })
   }
+
   def collect(f: PartialFunction[(String, Option[String]), (String, Option[String])]): Query =
     Query(params.collect(f))
-  def flatMap(f: ((String, Option[String])) => GenTraversableOnce[(String, Option[String])]): Query =
+
+  def flatMap(f: ((String, Option[String])) => IterableOnce[(String, Option[String])]): Query =
     Query(params.flatMap(f))
+
   def mapNames(f: String => String): Query =
     Query(params.map {
-      case (n, v) => (f(n), v)
+      case (n, v) =>
+        (f(n), v)
     })
+
   def mapValues(f: String => String): Query =
     Query(params.map {
-      case (n, v) => (n, v map f)
+      case (n, v) =>
+        (n, v map f)
     })
+
   def filter(f: ((String, Option[String])) => Boolean): Query =
     Query(params.filter(f))
+
   def filterNames(f: String => Boolean): Query =
     Query(params.filter {
-      case (n, _) => f(n)
+      case (n, _) =>
+        f(n)
     })
+
   def filterValues(f: String => Boolean): Query =
     Query(params.filter {
       case (_, Some(v)) => f(v)
       case _            => false
     })
+
   def filterOptionValues(f: Option[String] => Boolean): Query =
     Query(params.filter {
-      case (_, v) => f(v)
+      case (_, v) =>
+        f(v)
     })
   def replaceAll(k: String, v: Option[String]): Query = Query(params.filterNot(_._1 == k) :+ (k -> v))
   def replaceAll(k: String, v: String): Query         = replaceAll(k, Some(v))
   def removeAll(k: String): Query                     = filterNames(_ != k)
   def removeAll(k: String*): Query                    = removeAll(k)
-  def removeAll(k: GenTraversableOnce[String]): Query = filterNames(name => !k.exists(_ == name))
+  def removeAll(k: IterableOnce[String]): Query       = filterNames(name => !k.iterator.contains(name))
   def isEmpty: Boolean                                = params.isEmpty
   def nonEmpty: Boolean                               = params.nonEmpty
 
@@ -79,7 +91,7 @@ case class Query(params: Vector[(String, Option[String])]) {
       .map {
         case (k, v) =>
           if (v.isEmpty)
-            k.toString
+            k
           else
             s"$k=${v.mkString(",")}"
       }

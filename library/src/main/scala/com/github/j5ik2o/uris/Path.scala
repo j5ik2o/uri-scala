@@ -1,9 +1,5 @@
 package com.github.j5ik2o.uris
 
-import fastparse.core.Parsed
-
-import scala.collection.GenTraversableOnce
-
 sealed trait Path {
 
   def parts: Vector[String]
@@ -12,7 +8,7 @@ sealed trait Path {
 
   def nonEmpty: Boolean = !isEmpty
 
-  def withParts(parts: GenTraversableOnce[String]): Path
+  def withParts(parts: IterableOnce[String]): Path
 
   def toRootless: RootlessPath
 
@@ -24,7 +20,7 @@ sealed trait Path {
   def addParts(otherParts: String*): Path =
     addParts(otherParts)
 
-  def addParts(otherParts: GenTraversableOnce[String]): Path =
+  def addParts(otherParts: IterableOnce[String]): Path =
     withParts(parts = parts ++ otherParts)
 
 }
@@ -35,15 +31,16 @@ object Path {
 
   val slash: Path = AbsolutePath(Vector.empty)
 
-  def apply(parts: GenTraversableOnce[String]): Path = {
+  def apply(parts: IterableOnce[String]): Path = {
     parts match {
-      case p if p.isEmpty => EmptyPath
-      case p              => AbsolutePath(p.toVector)
+      case p if p.iterator.isEmpty => EmptyPath
+      case p                       => AbsolutePath(p.iterator.toVector)
     }
   }
 
   def parse(s: CharSequence): Path = {
-    val Parsed.Success(result, _) = UriParser.path.parse(s.toString)
+    import fastparse._
+    val Parsed.Success(result, _) = fastparse.parse(s.toString, UriParser.path(_))
     result
   }
 
@@ -51,8 +48,8 @@ object Path {
 
 final case class AbemptyPath(parts: Vector[String]) extends Path {
 
-  override def withParts(otherParts: GenTraversableOnce[String]): Path =
-    AbemptyPath(otherParts.toVector)
+  override def withParts(otherParts: IterableOnce[String]): Path =
+    AbemptyPath(otherParts.iterator.to(Vector))
 
   override def toAbsolute: AbsolutePath = AbsolutePath(parts)
 
@@ -68,8 +65,8 @@ final case class AbsolutePath(parts: Vector[String]) extends Path {
 
   def toAbsolute: AbsolutePath = this
 
-  def withParts(otherParts: GenTraversableOnce[String]): Path =
-    copy(parts = otherParts.toVector)
+  def withParts(otherParts: IterableOnce[String]): Path =
+    copy(parts = otherParts.iterator.to(Vector))
 
   def isEmpty: Boolean = false
 
@@ -81,8 +78,8 @@ final case class AbsolutePath(parts: Vector[String]) extends Path {
 
 final case class NoSchemePath(parts: Vector[String]) extends Path {
 
-  override def withParts(otherParts: GenTraversableOnce[String]): Path =
-    NoSchemePath(otherParts.toVector)
+  override def withParts(otherParts: IterableOnce[String]): Path =
+    NoSchemePath(otherParts.iterator.to(Vector))
 
   override def toRootless: RootlessPath = RootlessPath(parts)
 
@@ -100,8 +97,8 @@ final case class RootlessPath(parts: Vector[String]) extends Path {
 
   def toAbsolute: AbsolutePath = AbsolutePath(parts)
 
-  def withParts(otherParts: GenTraversableOnce[String]): Path =
-    RootlessPath(otherParts.toVector)
+  def withParts(otherParts: IterableOnce[String]): Path =
+    RootlessPath(otherParts.iterator.to(Vector))
 
   def isEmpty: Boolean = parts.isEmpty
 
@@ -115,8 +112,8 @@ case object EmptyPath extends Path {
 
   def toAbsolute: AbsolutePath = AbsolutePath(Vector.empty)
 
-  def withParts(parts: GenTraversableOnce[String]): Path =
-    Path(parts.toVector)
+  def withParts(parts: IterableOnce[String]): Path =
+    Path(parts.iterator.to(Vector))
 
   def parts: Vector[String] = Vector.empty
 
