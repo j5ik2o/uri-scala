@@ -84,7 +84,7 @@ case class Query(params: Vector[(String, Option[String])]) {
   def isEmpty: Boolean                                = params.isEmpty
   def nonEmpty: Boolean                               = params.nonEmpty
 
-  override def toString =
+  override def toString: String =
     paramMap
       .map { case (k, v) =>
         if (v.isEmpty)

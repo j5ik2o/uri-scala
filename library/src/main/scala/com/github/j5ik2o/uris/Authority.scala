@@ -10,7 +10,7 @@ case class Authority(hostName: String, port: Option[Int], userInfo: Option[UserI
 
   def withUserInfo(value: Option[UserInfo]): Authority = copy(userInfo = value)
 
-  override def toString = s"${userInfo.fold("")(v => s"$v@")}$hostName${port.fold("")(v => s":$v")}"
+  override def toString: String = s"${userInfo.fold("")(v => s"$v@")}$hostName${port.fold("")(v => s":$v")}"
 }
 
 object Authority {

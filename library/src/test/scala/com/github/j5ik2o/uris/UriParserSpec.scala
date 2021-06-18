@@ -9,18 +9,18 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks {
 
   implicit val noShrink: Shrink[String] = Shrink.shrinkAny
-  val lowAlphaGen                       = Gen.choose('a', 'z')
-  val highAlphaGen                      = Gen.choose('A', 'Z')
-  val alphaCharGen                      = Gen.frequency((5, lowAlphaGen), (5, highAlphaGen))
-  val digitGen                          = Gen.choose('0', '9')
-  val hexdigit                          = Gen.frequency((5, digitGen), (5, Gen.choose('A', 'F')), (5, Gen.choose('a', 'f')))
+  val lowAlphaGen: Gen[Char]            = Gen.choose('a', 'z')
+  val highAlphaGen: Gen[Char]           = Gen.choose('A', 'Z')
+  val alphaCharGen: Gen[Char]           = Gen.frequency((5, lowAlphaGen), (5, highAlphaGen))
+  val digitGen: Gen[Char]               = Gen.choose('0', '9')
+  val hexdigit: Gen[Char]               = Gen.frequency((5, digitGen), (5, Gen.choose('A', 'F')), (5, Gen.choose('a', 'f')))
 
   val unreservedGen: Gen[Char] =
     Gen.frequency((2, alphaCharGen), (3, digitGen), (5, Gen.oneOf(Seq('-', '.', '_', '~'))))
-  val genDelimsGen                   = Gen.oneOf(Seq(':', '/', '?', '#', '[', ']', '@'))
+  val genDelimsGen: Gen[Char]        = Gen.oneOf(Seq(':', '/', '?', '#', '[', ']', '@'))
   val subDelimsGen: Gen[Char]        = Gen.oneOf(Seq('!', '$', '&', '"', '(', ')', '*', '+', ',', ';', '='))
   val subDelimsWithoutGen: Gen[Char] = Gen.oneOf(Seq('!', '$', '"', '(', ')', '*', '+', ',', ';'))
-  val reservedGen                    = Gen.frequency((5, genDelimsGen), (5, subDelimsGen))
+  val reservedGen: Gen[Char]         = Gen.frequency((5, genDelimsGen), (5, subDelimsGen))
   val pctEncodedGen: Gen[String]     = Gen.listOfN(2, hexdigit).map(v => "%" + v.mkString)
 
   val pcharGen: Gen[String] = Gen.frequency(
@@ -47,9 +47,9 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
     .suchThat(_.nonEmpty)
     .map(_.mkString("&"))
   //val queryGen     = Gen.frequency((9, pcharGen), (1, Gen.oneOf(Seq('/', '?')).map(_.toString)))
-  val fragmentGen  = Gen.frequency((9, pcharGen), (1, Gen.oneOf(Seq('/', '?')).map(_.toString)))
-  val segmentGen   = Gen.listOf(pcharGen).map(_.mkString)
-  val segmentNzGen = Gen.listOf(pcharGen).map(_.mkString).suchThat(_.nonEmpty)
+  val fragmentGen: Gen[String]  = Gen.frequency((9, pcharGen), (1, Gen.oneOf(Seq('/', '?')).map(_.toString)))
+  val segmentGen: Gen[String]   = Gen.listOf(pcharGen).map(_.mkString)
+  val segmentNzGen: Gen[String] = Gen.listOf(pcharGen).map(_.mkString).suchThat(_.nonEmpty)
 
   val segmentNzNcGen: Gen[String] = Gen
     .listOf(
@@ -63,9 +63,9 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
     .map(_.mkString)
     .suchThat(_.nonEmpty)
 
-  val pathAbemptyGen = Gen.listOf(segmentGen.map(v => "/" + v)).map(_.mkString).suchThat(_.nonEmpty)
+  val pathAbemptyGen: Gen[String] = Gen.listOf(segmentGen.map(v => "/" + v)).map(_.mkString).suchThat(_.nonEmpty)
 
-  val pathAbsoluteGen = Gen
+  val pathAbsoluteGen: Gen[String] = Gen
     .listOf(segmentNzGen.map(v => "/" + v))
     .map(_.mkString)
     .flatMap { v =>
@@ -73,13 +73,13 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
     }
     .suchThat(_.nonEmpty)
 
-  val pathNoschemeGen = segmentNzNcGen
+  val pathNoschemeGen: Gen[String] = segmentNzNcGen
     .flatMap { v =>
       Gen.listOf(segmentGen.map(v2 => "/" + v2)).map(_.mkString).map(v2 => v + v2)
     }
     .suchThat(_.nonEmpty)
 
-  val pathRootlessGen = segmentNzGen
+  val pathRootlessGen: Gen[String] = segmentNzGen
     .flatMap { v =>
       Gen.listOf(segmentGen.map(v2 => "/" + v2)).map(_.mkString).map(v2 => v + v2)
     }
@@ -106,26 +106,26 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
     v4 <- decOctetGen
   } yield s"$v1.$v2.$v3.$v4"
 
-  val h16Gen = Gen
+  val h16Gen: Gen[String] = Gen
     .choose(1, 4)
     .flatMap { n =>
       Gen.listOfN(n, hexdigit).map(_.mkString)
     }
     .suchThat(_.nonEmpty)
 
-  val ls32Gen = Gen.frequency((5, ipv4AddressGen), (5, h16Gen.flatMap(v => h16Gen.map(s => v + ":" + s))))
+  val ls32Gen: Gen[String] = Gen.frequency((5, ipv4AddressGen), (5, h16Gen.flatMap(v => h16Gen.map(s => v + ":" + s))))
 
   //  6( h16 ":" ) ls32
-  val ipv6AddressGen1 = Gen.listOfN(6, h16Gen).flatMap { s =>
+  val ipv6AddressGen1: Gen[String] = Gen.listOfN(6, h16Gen).flatMap { s =>
     ls32Gen.map(v => s.mkString(":") + ":" + v)
   }
 
   // "::" 5( h16 ":" ) ls32
-  val ipv6AddressGen2 = Gen.listOfN(5, h16Gen).flatMap { s =>
+  val ipv6AddressGen2: Gen[String] = Gen.listOfN(5, h16Gen).flatMap { s =>
     ls32Gen.map(v => "::" + s.mkString(":") + ":" + v)
   }
 
-  val ipv6AddressGen3 = Gen.listOfN(4, h16Gen).flatMap { s =>
+  val ipv6AddressGen3: Gen[String] = Gen.listOfN(4, h16Gen).flatMap { s =>
     ls32Gen.map(v => "::" + s.mkString(":") + ":" + v)
   }
 

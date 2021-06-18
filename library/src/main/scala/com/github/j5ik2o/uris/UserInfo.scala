@@ -3,7 +3,7 @@ package com.github.j5ik2o.uris
 import java.text.ParseException
 
 case class UserInfo(user: String, password: Option[String] = None) {
-  override def toString = s"$user${password.fold("")(v => s":$v")}"
+  override def toString: String = s"$user${password.fold("")(v => s":$v")}"
 }
 
 object UserInfo {

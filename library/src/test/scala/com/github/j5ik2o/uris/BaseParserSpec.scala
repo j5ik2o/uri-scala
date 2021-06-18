@@ -9,11 +9,11 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 class BaseParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with BaseParser {
 
   implicit val noShrink: Shrink[String] = Shrink.shrinkAny
-  val lowAlphaGen                       = Gen.choose('a', 'z')
-  val highAlphaGen                      = Gen.choose('A', 'Z')
-  val alphaCharGen                      = Gen.frequency((5, lowAlphaGen), (5, highAlphaGen))
-  val digitGen                          = Gen.choose('0', '9')
-  val hexdigit                          = Gen.frequency((5, digitGen), (5, Gen.choose('A', 'F')))
+  val lowAlphaGen: Gen[Char]            = Gen.choose('a', 'z')
+  val highAlphaGen: Gen[Char]           = Gen.choose('A', 'Z')
+  val alphaCharGen: Gen[Char]           = Gen.frequency((5, lowAlphaGen), (5, highAlphaGen))
+  val digitGen: Gen[Char]               = Gen.choose('0', '9')
+  val hexdigit: Gen[Char]               = Gen.frequency((5, digitGen), (5, Gen.choose('A', 'F')))
 
   //      val stringGen: Gen[String] = Gen.listOf(alphaCharGen).map(_.mkString).suchThat(_.nonEmpty)
 
