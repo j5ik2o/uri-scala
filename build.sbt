@@ -21,7 +21,7 @@ def crossScalacOptions(scalaVersion: String): Seq[String] =
 
 lazy val baseSettings = Seq(
   organization := "com.github.j5ik2o",
-  homepage := Some(url("https://github.com/j5ik2o/uris")),
+  homepage := Some(url("https://github.com/j5ik2o/uri-scala")),
   licenses := List("The MIT License" -> url("http://opensource.org/licenses/MIT")),
   developers := List(
     Developer(
@@ -69,7 +69,7 @@ lazy val baseSettings = Seq(
 lazy val library = (project in file("library"))
   .settings(baseSettings)
   .settings(
-    name := "uris",
+    name := "uri-scala",
     libraryDependencies ++= Seq(
       "com.lihaoyi"       %% "fastparse"       % "2.3.2",
       "org.typelevel"     %% "cats-core"       % "2.6.1",
@@ -81,7 +81,7 @@ lazy val library = (project in file("library"))
 lazy val root = (project in file("."))
   .settings(baseSettings)
   .settings(
-    name := "uris-root",
+    name := "uri-scala-root",
     publish / skip := true
   )
   .aggregate(library)
