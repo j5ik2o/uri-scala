@@ -3,7 +3,7 @@ package com.github.j5ik2o.uri
 import java.text.ParseException
 
 case class UserInfo(user: String, password: Option[String] = None) {
-  override def toString: String = s"$user${password.fold("")(v => s":$v")}"
+  def asString: String = s"$user${password.fold("")(v => s":$v")}"
 }
 
 object UserInfo {
@@ -13,7 +13,7 @@ object UserInfo {
   }
 
   def parse(user: String, password: Option[String] = None): Either[ParseException, UserInfo] = {
-    parse(new UserInfo(user, password).toString)
+    parse(new UserInfo(user, password).asString)
   }
 
   def parseWithException(s: CharSequence): UserInfo =

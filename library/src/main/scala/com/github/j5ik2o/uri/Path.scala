@@ -25,6 +25,8 @@ sealed trait Path {
   def addParts(otherParts: IterableOnce[String]): Path =
     withParts(parts = parts ++ otherParts)
 
+  def asString: String
+
 }
 
 object Path {
@@ -68,22 +70,22 @@ final case class AbemptyPath(parts: Vector[String]) extends Path {
 
   override def toRootless: RootlessPath = RootlessPath(parts)
 
-  override def toString: String = parts.mkString("/", "/", "")
+  override def asString: String = parts.mkString("/", "/", "")
 
 }
 
 final case class AbsolutePath(parts: Vector[String]) extends Path {
 
-  def toAbsolute: AbsolutePath = this
+  override def toAbsolute: AbsolutePath = this
 
-  def withParts(otherParts: IterableOnce[String]): Path =
+  override def withParts(otherParts: IterableOnce[String]): Path =
     copy(parts = otherParts.iterator.to(Vector))
 
-  def isEmpty: Boolean = false
+  override def isEmpty: Boolean = false
 
   override def toRootless: RootlessPath = RootlessPath(parts)
 
-  override def toString: String = parts.mkString("/", "/", "")
+  override def asString: String = parts.mkString("/", "/", "")
 
 }
 
@@ -98,40 +100,40 @@ final case class NoSchemePath(parts: Vector[String]) extends Path {
 
   override def isEmpty: Boolean = parts.isEmpty
 
-  override def toString: String = parts.mkString("", "/", "")
+  override def asString: String = parts.mkString("", "/", "")
 
 }
 
 final case class RootlessPath(parts: Vector[String]) extends Path {
 
-  def toRootless: RootlessPath = this
+  override def toRootless: RootlessPath = this
 
-  def toAbsolute: AbsolutePath = AbsolutePath(parts)
+  override def toAbsolute: AbsolutePath = AbsolutePath(parts)
 
-  def withParts(otherParts: IterableOnce[String]): Path =
+  override def withParts(otherParts: IterableOnce[String]): Path =
     RootlessPath(otherParts.iterator.to(Vector))
 
-  def isEmpty: Boolean = parts.isEmpty
+  override def isEmpty: Boolean = parts.isEmpty
 
-  override def toString: String = parts.mkString("", "/", "")
+  override def asString: String = parts.mkString("", "/", "")
 
 }
 
 case object EmptyPath extends Path {
 
-  def isEmpty: Boolean = true
+  override def isEmpty: Boolean = true
 
-  def toAbsolute: AbsolutePath = AbsolutePath(Vector.empty)
+  override def toAbsolute: AbsolutePath = AbsolutePath(Vector.empty)
 
-  def withParts(parts: IterableOnce[String]): Path =
+  override def withParts(parts: IterableOnce[String]): Path =
     Path.fromParts(parts.iterator.to(Vector))
 
-  def parts: Vector[String] = Vector.empty
+  override def parts: Vector[String] = Vector.empty
 
   def unapply(path: Path): Boolean = path.isEmpty
 
   override def toRootless: RootlessPath = RootlessPath(parts)
 
-  override def toString: String = ""
+  override def asString: String = ""
 
 }

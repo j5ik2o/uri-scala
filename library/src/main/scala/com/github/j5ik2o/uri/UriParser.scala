@@ -3,26 +3,30 @@ package com.github.j5ik2o.uri
 import fastparse.NoWhitespace._
 import fastparse._
 
+/** https://tools.ietf.org/html/rfc3986
+  * https://github.com/akka/akka-http/blob/v10.2.4/akka-http-core/src/main/scala/akka/http/scaladsl/model/Uri.scala
+  * https://github.com/frohoff/jdk8u-jdk/blob/master/src/share/classes/java/net/URI.java
+  */
 object UriParser extends BaseParser {
-
-  def absoluteURI[_: P]: P[Uri] = P(scheme ~ ":" ~ hierPart ~ ("?" ~ query).? ~ End).map {
-    case (scheme, (authority, path), query) =>
-      new Uri(scheme, authority, path, query, None)
-  }
 
   def uri[_: P]: P[Uri] = P(scheme ~ ":" ~ hierPart ~ ("?" ~ query).? ~ ("#" ~ fragment).? ~ End).map {
     case (scheme, (authority, path), query, fragment) =>
       new Uri(scheme, authority, path, query, fragment)
   }
 
-  // def uRIReference = P(URI | relativeRef)
+  def absoluteURI[_: P]: P[Uri] = P(scheme ~ ":" ~ hierPart ~ ("?" ~ query).? ~ End).map {
+    case (scheme, (authority, path), query) =>
+      new Uri(scheme, authority, path, query, None)
+  }
+
+  // def uriReference[_: P]: P[Product] = P(uri | relativeRef)
 
   def hierPart[_: P]: P[(Authority, Path)] = P(
     "//" ~ authority ~ (pathAbempty | pathAbsolute | pathRootless | pathEmpty)
   )
 
-  def relativeRef[_: P]: P[(Authority, Path, Option[Query], String)] =
-    P(relativePart ~ ("?" ~ query).? ~ ("#" ~ fragment))
+  def relativeRef[_: P]: P[(Authority, Path, Option[Query], Option[String])] =
+    P(relativePart ~ ("?" ~ query).? ~ ("#" ~ fragment).?)
 
   def relativePart[_: P]: P[(Authority, Path)] = P(
     "//" ~ authority ~ (pathAbempty | pathAbsolute | pathNoScheme | pathEmpty)
