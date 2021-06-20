@@ -176,28 +176,28 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
     }
     "pathAbempty" in forAll(pathAbemptyGen) { value =>
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.pathAbempty(_))
-      result.toString shouldBe value
+      result.asString shouldBe value
     }
     "pathAbsolute" in forAll(pathAbsoluteGen) { value =>
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.pathAbsolute(_))
-      result.toString shouldBe value
+      result.asString shouldBe value
     }
     "pathNoscheme" in forAll(pathNoschemeGen) { value =>
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.pathNoScheme(_))
-      result.toString shouldBe value
+      result.asString shouldBe value
     }
     "pathRootless" in forAll(pathRootlessGen) { value =>
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.pathRootless(_))
-      result.toString shouldBe value
+      result.asString shouldBe value
     }
     "pathEmpty" in {
       val value                     = ""
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.pathEmpty(_))
-      result.toString shouldBe value
+      result.asString shouldBe value
     }
     "path" in forAll(pathGen) { value =>
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.path(_))
-      result.toString shouldBe value
+      result.asString shouldBe value
     }
     "regName" in forAll(regNameGen) { value =>
       val Parsed.Success(result, _) = fastparse.parse(value, UriParser.regName(_))
@@ -237,7 +237,7 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
         Some(Query.parseWithException(Vector("key1" -> Some("abc")))),
         None
       )
-      result.toString() shouldBe value
+      result.asString shouldBe value
     }
   }
 

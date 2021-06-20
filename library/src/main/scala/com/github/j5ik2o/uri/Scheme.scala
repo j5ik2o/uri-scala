@@ -2,7 +2,9 @@ package com.github.j5ik2o.uri
 
 import java.text.ParseException
 
-final case class Scheme(value: String)
+final case class Scheme(value: String) {
+  def asString: String = value
+}
 
 object Scheme {
 

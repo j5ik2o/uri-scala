@@ -31,8 +31,9 @@ case class Uri(
 
   def withFragment(value: Option[String]): Uri = copy(fragment = value)
 
-  override def toString: String = {
-    s"${scheme.value}://$authority$path${query.fold("")(v => s"?$v")}${fragment.fold("")(v => s"#$v")}"
+  def asString: String = {
+    s"${scheme.asString}://${authority.asString}${path.asString}${query.fold("")(v => s"?${v.asString}")}${fragment
+      .fold("")(v => s"#$v")}"
   }
 
 }
@@ -54,7 +55,7 @@ object Uri {
       query: Option[Query],
       fragment: Option[String]
   ): Either[ParseException, Uri] =
-    parse(new Uri(scheme, authority, path, query, fragment).toString)
+    parse(new Uri(scheme, authority, path, query, fragment).asString)
 
   def parseWithException(s: CharSequence): Uri = parse(s).fold(throw _, identity)
 

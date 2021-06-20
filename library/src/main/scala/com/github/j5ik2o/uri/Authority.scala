@@ -10,7 +10,7 @@ case class Authority(hostName: String, port: Option[Int], userInfo: Option[UserI
 
   def withUserInfo(value: Option[UserInfo]): Authority = copy(userInfo = value)
 
-  override def toString: String = s"${userInfo.fold("")(v => s"$v@")}$hostName${port.fold("")(v => s":$v")}"
+  def asString: String = s"${userInfo.fold("")(v => s"${v.asString}@")}$hostName${port.fold("")(v => s":$v")}"
 }
 
 object Authority {
@@ -19,7 +19,7 @@ object Authority {
     parse(hostName, port, userInfo).fold(throw _, identity)
 
   def parse(hostName: String, port: Option[Int], userInfo: Option[UserInfo]): Either[ParseException, Authority] = {
-    parse(new Authority(hostName, port, userInfo).toString)
+    parse(new Authority(hostName, port, userInfo).asString)
   }
 
   def parseWithException(s: CharSequence): Authority = parse(s).fold(throw _, identity)

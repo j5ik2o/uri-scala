@@ -84,7 +84,7 @@ case class Query private (params: Vector[(String, Option[String])]) {
   def isEmpty: Boolean                                = params.isEmpty
   def nonEmpty: Boolean                               = params.nonEmpty
 
-  override def toString: String =
+  def asString: String =
     paramMap
       .map { case (k, v) =>
         if (v.isEmpty)
@@ -98,7 +98,7 @@ case class Query private (params: Vector[(String, Option[String])]) {
 object Query {
 
   def parseWithException(params: Vector[(String, Option[String])]): Query = {
-    parse(new Query(params).toString).fold(throw _, identity)
+    parse(new Query(params).asString).fold(throw _, identity)
   }
 
   def parse(s: CharSequence): Either[ParseException, Query] = {
