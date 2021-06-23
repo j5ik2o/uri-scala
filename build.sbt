@@ -43,10 +43,7 @@ lazy val baseSettings = Seq(
     ) ++ crossScalacOptions(scalaVersion.value)
   ),
   resolvers ++= Seq(
-    Resolver.sonatypeRepo("snapshots"),
-    Resolver.sonatypeRepo("releases"),
-    "Seasar Repository" at "https://maven.seasar.org/maven2/",
-    "DynamoDB Local Repository" at "https://s3-us-west-2.amazonaws.com/dynamodb-local/release"
+    Resolver.sonatypeRepo("snapshots")
   ),
   semanticdbEnabled := true,
   semanticdbVersion := scalafixSemanticdb.revision,
@@ -72,7 +69,6 @@ lazy val library = (project in file("library"))
     name := "uri-scala",
     libraryDependencies ++= Seq(
       "com.lihaoyi"       %% "fastparse"       % "2.3.2",
-      "org.typelevel"     %% "cats-core"       % "2.6.1",
       "org.scalatest"     %% "scalatest"       % "3.2.9"   % "test",
       "org.scalatestplus" %% "scalacheck-1-15" % "3.2.9.0" % "test"
     )
