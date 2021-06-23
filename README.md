@@ -6,6 +6,8 @@
 [![Scaladoc](http://javadoc-badge.appspot.com/com.github.j5ik2o/uri-scala_2.13.svg?label=scaladoc)](http://javadoc-badge.appspot.com/com.github.j5ik2o/uri-scala_2.13/com/github/j5ik2o/uri/index.html?javadocio=true)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+This library provides a simple URI parsing and model.
+
 ## Installation
 
 Add the following to your sbt build (2.13.x):
