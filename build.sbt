@@ -32,6 +32,7 @@ lazy val baseSettings = Seq(
     )
   ),
   scalaVersion := Versions.scala213Version,
+  // crossScalaVersions ++= Seq(Versions.scala213Version, Versions.scala3Version),
   scalacOptions ++= (
     Seq(
       "-unchecked",
@@ -65,9 +66,9 @@ lazy val library = (project in file("library"))
   .settings(
     name := "uri-scala",
     libraryDependencies ++= Seq(
-      "com.lihaoyi"       %% "fastparse"       % "2.3.2",
-      "org.scalatest"     %% "scalatest"       % "3.2.9"   % "test",
-      "org.scalatestplus" %% "scalacheck-1-15" % "3.2.9.0" % "test"
+      ("com.lihaoyi"      %% "fastparse"       % "2.3.2").cross(CrossVersion.for3Use2_13),
+      "org.scalatest"     %% "scalatest"       % "3.2.9"   % Test,
+      "org.scalatestplus" %% "scalacheck-1-15" % "3.2.9.0" % Test
     )
   )
 
