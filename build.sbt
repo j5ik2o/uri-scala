@@ -50,9 +50,6 @@ lazy val baseSettings = Seq(
   Test / publishArtifact := false,
   Test / fork := true,
   Test / parallelExecution := false,
-  envVars := Map(
-    "AWS_REGION" -> "ap-northeast-1"
-  ),
   Compile / doc / sources := {
     val old = (Compile / doc / sources).value
     if (scalaVersion.value == scala3Version) {
@@ -73,6 +70,12 @@ lazy val library = (project in file("library"))
       "org.scalatestplus" %% "scalacheck-1-15" % "3.2.9.0" % "test"
     )
   )
+
+lazy val example = (project in file("example"))
+  .settings(baseSettings)
+  .settings(
+    name := "uri-example"
+  ).dependsOn(library)
 
 lazy val root = (project in file("."))
   .settings(baseSettings)
