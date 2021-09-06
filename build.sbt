@@ -66,7 +66,7 @@ lazy val library = (project in file("library"))
   .settings(
     name := "uri-scala",
     libraryDependencies ++= Seq(
-      ("com.lihaoyi"      %% "fastparse"       % "2.3.2").cross(CrossVersion.for3Use2_13),
+      ("com.lihaoyi"      %% "fastparse"       % "2.3.3").cross(CrossVersion.for3Use2_13),
       "org.scalatest"     %% "scalatest"       % "3.2.9"   % Test,
       "org.scalatestplus" %% "scalacheck-1-15" % "3.2.9.0" % Test
     )
