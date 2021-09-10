@@ -13,7 +13,7 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
   val highAlphaGen: Gen[Char]           = Gen.choose('A', 'Z')
   val alphaCharGen: Gen[Char]           = Gen.frequency((5, lowAlphaGen), (5, highAlphaGen))
   val digitGen: Gen[Char]               = Gen.choose('0', '9')
-  val hexdigit: Gen[Char]               = Gen.frequency((5, digitGen), (5, Gen.choose('A', 'F')), (5, Gen.choose('a', 'f')))
+  val hexdigit: Gen[Char] = Gen.frequency((5, digitGen), (5, Gen.choose('A', 'F')), (5, Gen.choose('a', 'f')))
 
   val unreservedGen: Gen[Char] =
     Gen.frequency((2, alphaCharGen), (3, digitGen), (5, Gen.oneOf(Seq('-', '.', '_', '~'))))
