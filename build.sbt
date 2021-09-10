@@ -21,8 +21,8 @@ def crossScalacOptions(scalaVersion: String): Seq[String] =
 
 lazy val baseSettings = Seq(
   organization := "com.github.j5ik2o",
-  homepage := Some(url("https://github.com/j5ik2o/uri-scala")),
-  licenses := List("The MIT License" -> url("http://opensource.org/licenses/MIT")),
+  homepage     := Some(url("https://github.com/j5ik2o/uri-scala")),
+  licenses     := List("The MIT License" -> url("http://opensource.org/licenses/MIT")),
   developers := List(
     Developer(
       id = "j5ik2o",
@@ -46,10 +46,10 @@ lazy val baseSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
-  semanticdbEnabled := true,
-  semanticdbVersion := scalafixSemanticdb.revision,
-  Test / publishArtifact := false,
-  Test / fork := true,
+  semanticdbEnabled        := true,
+  semanticdbVersion        := scalafixSemanticdb.revision,
+  Test / publishArtifact   := false,
+  Test / fork              := true,
   Test / parallelExecution := false,
   Compile / doc / sources := {
     val old = (Compile / doc / sources).value
@@ -81,7 +81,7 @@ lazy val example = (project in file("example"))
 lazy val root = (project in file("."))
   .settings(baseSettings)
   .settings(
-    name := "uri-scala-root",
+    name           := "uri-scala-root",
     publish / skip := true
   )
   .aggregate(library)
