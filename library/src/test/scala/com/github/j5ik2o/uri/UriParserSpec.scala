@@ -46,7 +46,7 @@ class UriParserSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
     })
     .suchThat(_.nonEmpty)
     .map(_.mkString("&"))
-  //val queryGen     = Gen.frequency((9, pcharGen), (1, Gen.oneOf(Seq('/', '?')).map(_.toString)))
+  // val queryGen     = Gen.frequency((9, pcharGen), (1, Gen.oneOf(Seq('/', '?')).map(_.toString)))
   val fragmentGen: Gen[String]  = Gen.frequency((9, pcharGen), (1, Gen.oneOf(Seq('/', '?')).map(_.toString)))
   val segmentGen: Gen[String]   = Gen.listOf(pcharGen).map(_.mkString)
   val segmentNzGen: Gen[String] = Gen.listOf(pcharGen).map(_.mkString).suchThat(_.nonEmpty)
