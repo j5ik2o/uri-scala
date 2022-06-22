@@ -33,7 +33,7 @@ case class Uri(
 
   def asString: String = {
     s"${scheme.asString}://${authority.asString}${path.asString}${query.fold("")(v => s"?${v.asString}")}${fragment
-      .fold("")(v => s"#$v")}"
+        .fold("")(v => s"#$v")}"
   }
 
 }
