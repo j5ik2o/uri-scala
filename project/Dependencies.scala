@@ -67,7 +67,7 @@ object Dependencies {
   }
 
   object j5ik2o {
-    val version = "1.1.1"
+    val version = "1.15.32"
 
     val dockerControllerScalaScalatest =
       "com.github.j5ik2o" %% "docker-controller-scala-scalatest" % version
