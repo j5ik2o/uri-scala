@@ -14,9 +14,9 @@ object Dependencies {
     val logbackVersion      = "1.4.11"
     val slf4jVersion        = "1.7.36"
     val ficusVersion        = "1.5.2"
-    val awsSdkV1Version     = "1.11.1027"
+    val awsSdkV1Version     = "1.12.556"
     val awsSdkV1DaxVersion  = "1.0.230341.0"
-    val awsSdkV2Version     = "2.16.71"
+    val awsSdkV2Version     = "2.20.153"
     val reactiveAwsDynamoDB = "1.2.6"
 
     val scalaTestVersion        = "3.2.17"
@@ -78,14 +78,14 @@ object Dependencies {
   }
 
   object testcontainers {
-    val testcontainersVersion    = "1.15.3"
+    val testcontainersVersion    = "1.19.0"
     val testcontainers           = "org.testcontainers" % "testcontainers" % testcontainersVersion
     val testcontainersLocalStack = "org.testcontainers" % "localstack"     % testcontainersVersion
     val testcontainersKafka      = "org.testcontainers" % "kafka"          % testcontainersVersion
   }
 
   object dimafeng {
-    val testcontainersScalaVersion  = "0.39.5"
+    val testcontainersScalaVersion  = "0.41.0"
     val testcontainerScala          = "com.dimafeng" %% "testcontainers-scala"           % testcontainersScalaVersion
     val testcontainerScalaScalaTest = "com.dimafeng" %% "testcontainers-scala-scalatest" % testcontainersScalaVersion
     //    val testcontainerScalaMsql       = "com.dimafeng" %% "testcontainers-scala-mysql" % testcontainersScalaVersion
