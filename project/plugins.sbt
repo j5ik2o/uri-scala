@@ -8,4 +8,4 @@ addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.13.0")
 
 addDependencyTreePlugin
 
-addSbtPlugin("ch.epfl.scala" % "sbt-scala3-migrate" % "0.7.1")
+addSbtPlugin("ch.epfl.scala" % "sbt-scala3-migrate" % "0.7.2")
